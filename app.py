@@ -10,17 +10,16 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Veritabanı nesnesini oluştur
 db = SQLAlchemy(app)
 
+# Uygulama başlar başlamaz tabloları oluştur
+with app.app_context():
+    db.create_all()
+
 # Alarm kaydı modeli
 class AlarmRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     account_no = db.Column(db.String(64), nullable=False)
     event_type = db.Column(db.String(64), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-@app.before_serving
-async def init_db():
-    # Uygulama başlamadan önce veritabanını hazırla
-    db.create_all()
 
 @app.route('/')
 def index():
@@ -32,7 +31,8 @@ def index():
 <head>
   <meta charset="utf-8">
   <title>AlarmCloud Log Panel</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 </head>
 <body class="bg-light">
   <div class="container py-4">
