@@ -7,7 +7,8 @@ app = Flask(__name__)
 # SQLite veritabanı aynı dizinde "alarms.db" olarak tutulacak
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///alarms.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
- db = SQLAlchemy(app)
+# Veritabanı nesnesini oluştur
+db = SQLAlchemy(app)
 
 # Alarm kaydı modeli
 class AlarmRecord(db.Model):
@@ -17,8 +18,8 @@ class AlarmRecord(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 @app.before_serving
-def init_db():
-    # İlk istekten önce veritabanını hazırla
+async def init_db():
+    # Uygulama başlamadan önce veritabanını hazırla
     db.create_all()
 
 @app.route('/')
@@ -31,20 +32,14 @@ def index():
 <head>
   <meta charset="utf-8">
   <title>AlarmCloud Log Panel</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
   <div class="container py-4">
     <h1 class="mb-4">🚨 Alarm Logları</h1>
     <table class="table table-striped">
       <thead class="table-dark">
-        <tr>
-          <th>#</th>
-          <th>Account No</th>
-          <th>Olay Türü</th>
-          <th>Zaman</th>
-        </tr>
+        <tr><th>#</th><th>Account No</th><th>Olay Türü</th><th>Zaman</th></tr>
       </thead>
       <tbody>
         {% for a in logs %}
@@ -86,5 +81,6 @@ def add():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
+    # Render port veya 5000 kullan
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
