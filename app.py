@@ -7,10 +7,10 @@ app = Flask(__name__)
 # SQLite veritabanı aynı dizinde "alarms.db" olarak tutulacak
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///alarms.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+ db = SQLAlchemy(app)
 
 # Alarm kaydı modeli
-type AlarmRecord(db.Model):
+class AlarmRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     account_no = db.Column(db.String(64), nullable=False)
     event_type = db.Column(db.String(64), nullable=False)
@@ -18,7 +18,7 @@ type AlarmRecord(db.Model):
 
 @app.before_serving
 def init_db():
-    # İlk HTTP isteğinden önce veritabanını hazırla
+    # İlk istekten önce veritabanını hazırla
     db.create_all()
 
 @app.route('/')
@@ -86,6 +86,5 @@ def add():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    # Portu ortam değişkeninden al (Render için) veya 5000 varsayılan
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
